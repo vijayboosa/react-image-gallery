@@ -10,14 +10,28 @@ import { useState } from "react"
 
 
 function Image(p) {
-  // p ->  {src: imgData}
+  // p ->  {src: imgData, onClick: function<handleImgClick>}
   return (<>
-    <img src={p.src} alt="car-photos" className="w-full px-1 md:w-1/3 lg:w-1/4 sm:w-1/2  rounded-2xl " />
+    <img src={p.src} alt="car-photos" className="w-full px-1 md:w-1/3 lg:w-1/4 2xl:w-1/5 sm:w-1/2  rounded-2xl " onClick={p.onClick}/>
   </>)
+}
+
+function OverlayComp() {
+  return (
+<div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full border bg-slate-400/30">
+      <div className="flex justify-center items-center h-full w-1/2 mx-auto">
+      <img src={three} alt="car-photos"  />
+      </div>
+    </div>
+  )
 }
 
 // props -> {imageType: 'car'}
 function MainBody(props) {
+  // useState Hook provides two things
+  // 1 -> the value it is holding
+  // 2 -> a callback or function to change the value
+  const [value, setValue] = useState(false)
 
   const imagesList = [
     {
@@ -54,6 +68,10 @@ function MainBody(props) {
     },
   ]
 
+  const handleImgClick = () => {
+    setValue(!value)
+  }
+
   // [{image: one, tags: ["car"]}, {image: two, tags: ["car"]}]
   const filteredImages = imagesList.filter((e) => {
     if (e.tags.includes(props.imageType.toLowerCase()) || props.imageType === "") {
@@ -63,15 +81,19 @@ function MainBody(props) {
 
   return (<>
 
-    <div className="flex my-6 flex-wrap gap-y-2">
+    <div className="flex my-6 flex-wrap gap-y-2 ">
       {
         // [<Image src={one} />, <Image src={two}/>]
         filteredImages.map((e) => {
-          return <Image src={e.image} />
+          return <Image src={e.image} onClick={handleImgClick}/>
         })
       }
     </div>
 
+      {
+          value ? <OverlayComp/> : null
+      }
+      {/* <OverlayComp/> */}
   </>)
 }
 
@@ -86,7 +108,7 @@ function App() {
 
   return (<>
 
-    <div className="container m-2 mx-auto">
+    <div className="m-2 mx-auto w-[80%] ">
       <div className="container w-1/2 text-center mx-auto my-6">
         <input type="text" className="border border-indigo-500 w-full text-3xl rounded"
           onChange={handleInput}
