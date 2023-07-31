@@ -12,16 +12,31 @@ import { useState } from "react"
 function Image(p) {
   // p ->  {src: imgData, onClick: function<handleImgClick>}
   return (<>
-    <img src={p.src} alt="car-photos" className="w-full px-1 md:w-1/3 lg:w-1/4 2xl:w-1/5 sm:w-1/2  rounded-2xl " onClick={p.onClick}/>
+    <img src={p.src} alt="car-photos" className="w-full px-1 md:w-1/3 lg:w-1/4 2xl:w-1/5 sm:w-1/2  rounded-2xl cursor-pointer" onClick={p.onClick}/>
   </>)
 }
 
-function OverlayComp() {
+function OverlayComp(props) {
+  // props -> {imgSrc: two, handleClose: function<handleOverlayClose>}
+  const handleParentClick = (event)  => {
+    event.preventDefault()
+    // console.log(event.target);
+    if (event.target === event.currentTarget) {
+      props.handleClose()
+    }
+  }
+
   return (
-<div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full border bg-slate-400/30">
-      <div className="flex justify-center items-center h-full w-1/2 mx-auto">
-      <img src={three} alt="car-photos"  />
+<div className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full border bg-slate-400/30 flex justify-center items-center h-full w-1/2 mx-auto" onClick={handleParentClick}>
+  <div className="w-1/2 mx-auto relative">
+      <img src={props.imgSrc} alt="car-photos"/>
+      <div className="absolute bottom-0 left-0 inset-x-0 p-2">
+        <div className="flex items-center gap-x-2 text-white font-semibold hover:underline select-none cursor-pointer">
+          <img src="https://imgv3.fotor.com/images/blog-cover-image/10-profile-picture-ideas-to-make-you-stand-out.jpg" alt="profile-photo" className="h-10 w-10 rounded-full object-cover"/>
+          <h1>Abhi</h1>
+        </div>
       </div>
+  </div>
     </div>
   )
 }
@@ -31,7 +46,7 @@ function MainBody(props) {
   // useState Hook provides two things
   // 1 -> the value it is holding
   // 2 -> a callback or function to change the value
-  const [value, setValue] = useState(false)
+  const [value, setValue] = useState("")
 
   const imagesList = [
     {
@@ -68,9 +83,16 @@ function MainBody(props) {
     },
   ]
 
-  const handleImgClick = () => {
-    setValue(!value)
+  function handleImgClick(imgSrc) {
+    return () => {
+      setValue(imgSrc)
+    }
   }
+
+  const handleOverlayClose = () => {
+    setValue("")
+  }
+
 
   // [{image: one, tags: ["car"]}, {image: two, tags: ["car"]}]
   const filteredImages = imagesList.filter((e) => {
@@ -85,13 +107,16 @@ function MainBody(props) {
       {
         // [<Image src={one} />, <Image src={two}/>]
         filteredImages.map((e) => {
-          return <Image src={e.image} onClick={handleImgClick}/>
+          // e -> {image: three, tags: ["car", "humans", "sunset"]}
+          // handleImageClick(e) -> () => {setValue(e)}
+          // return <Image src={e.image} onClick={() => {setValue(e)}}/> 
+          return <Image src={e.image} onClick={handleImgClick(e.image)}/>
         })
       }
     </div>
 
       {
-          value ? <OverlayComp/> : null
+          value ? <OverlayComp imgSrc={value} handleClose={handleOverlayClose}/> : null
       }
       {/* <OverlayComp/> */}
   </>)
@@ -115,7 +140,7 @@ function App() {
         />
       </div>
 
-      <MainBody imageType={value} />
+      {/* <MainBody imageType={value} /> */}
     </div>
 
 
